@@ -1,0 +1,46 @@
+syntax = "proto2";
+package proto;
+
+option go_package = "./protocol";
+
+service UserService{
+  rpc Create(CreateRequest) returns(CreateReply){}
+  rpc UpdateBalance(UpdateBalanceRequest) returns(UpdateBalanceReply){}
+  rpc GetBalance(GetBalanceRequest) returns(GetBalanceReply){}
+  rpc Login(LoginRequest) returns(LoginReply){}
+}
+
+message LoginRequest{
+  required string login = 1;
+  required string password = 2;
+}
+
+message LoginReply{
+  required string jwt = 1;
+  required string RT = 2;
+}
+
+message CreateRequest{
+  required string login = 1;
+  required string password = 2;
+}
+
+message CreateReply{
+  required string message = 1;
+}
+
+message UpdateBalanceRequest{
+  required string uid = 1;
+  required int64 balance = 2;
+}
+
+message UpdateBalanceReply{
+}
+
+message GetBalanceRequest{
+  required string uid = 1;
+}
+
+message GetBalanceReply{
+  required int64 balance = 1;
+}
