@@ -3,11 +3,11 @@ package service
 import (
 	"context"
 	authProto "github.com/INEFFABLE-games/authService/protocol"
+	"github.com/INEFFABLE-games/positionsUserService/internal/client"
+	"github.com/INEFFABLE-games/positionsUserService/internal/models"
+	"github.com/INEFFABLE-games/positionsUserService/internal/repository"
 	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
-	"positionsUserService/internal/client"
-	"positionsUserService/internal/models"
-	"positionsUserService/internal/repository"
 )
 
 type UserService struct {
@@ -41,29 +41,43 @@ func (u *UserService) GetBalance(ctx context.Context, uid string) (int64, error)
 	return u.userRepository.GetBalance(ctx, uid)
 }
 
-func (u *UserService) Login(ctx context.Context, login string, password string) (string,string, error) {
+func (u *UserService) Refresh(ctx context.Context, uid string) (string, string, error) {
+	reply, err := u.authClient.Refresh(ctx, &authProto.RefreshRequest{
+		Uid: &uid,
+	})
+	if err != nil {
+		return "", "", err
+	}
+
+	jwt := reply.GetJwt()
+	Rt := reply.GetRt()
+
+	return jwt, Rt, err
+}
+
+func (u *UserService) Login(ctx context.Context, login string, password string) (string, string, error) {
 
 	user, err := u.userRepository.GetUserByLogin(ctx, login)
 	if err != nil {
-		return "","", err
+		return "", "", err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return "","", err
+		return "", "", err
 	}
 
 	reply, err := u.authClient.Refresh(ctx, &authProto.RefreshRequest{
 		Uid: &user.Uid,
 	})
 	if err != nil {
-		return "","",err
+		return "", "", err
 	}
 
 	jwt := reply.GetJwt()
 	Rt := reply.GetRt()
 
-	return jwt,Rt, err
+	return jwt, Rt, err
 }
 
 func NewUserService(userRepository *repository.UserRepository, authClient *client.AuthClient) *UserService {

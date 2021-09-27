@@ -8,6 +8,16 @@ service UserService{
   rpc UpdateBalance(UpdateBalanceRequest) returns(UpdateBalanceReply){}
   rpc GetBalance(GetBalanceRequest) returns(GetBalanceReply){}
   rpc Login(LoginRequest) returns(LoginReply){}
+  rpc RefreshTokens(RefreshTokensRequest) returns(RefreshTokensReply){}
+}
+
+message RefreshTokensRequest{
+  required string RT = 1;
+}
+
+message RefreshTokensReply{
+  required string RT = 1;
+  required string JWT = 2;
 }
 
 message LoginRequest{

@@ -4,16 +4,16 @@ import (
 	"database/sql"
 	"fmt"
 	authService "github.com/INEFFABLE-games/authService/protocol"
+	"github.com/INEFFABLE-games/positionsUserService/internal/client"
+	"github.com/INEFFABLE-games/positionsUserService/internal/config"
+	"github.com/INEFFABLE-games/positionsUserService/internal/repository"
+	"github.com/INEFFABLE-games/positionsUserService/internal/server"
+	"github.com/INEFFABLE-games/positionsUserService/internal/service"
+	"github.com/INEFFABLE-games/positionsUserService/protocol"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"net"
-	"positionsUserService/internal/client"
-	"positionsUserService/internal/config"
-	"positionsUserService/internal/repository"
-	"positionsUserService/internal/server"
-	"positionsUserService/internal/service"
-	"positionsUserService/protocol"
 )
 
 func main() {
@@ -36,7 +36,7 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 	userRepository := repository.NewUserRepository(sqlConn)
-	userService := service.NewUserService(userRepository,authClient)
+	userService := service.NewUserService(userRepository, authClient)
 	userServer := server.NewUserServer(userService)
 	protocol.RegisterUserServiceServer(grpcServer, userServer)
 
